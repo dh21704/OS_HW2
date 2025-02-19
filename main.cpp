@@ -12,22 +12,53 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <cstdlib>
+#include <ctime>
 
 
 #include <vector>
 
 using namespace std;
 
+//global PID for pid management
+bool *pid_map = nullptr;
+
 //creates and initializes the bitmap for PID management
 int allocate_map()
 {
+     pid_map = (bool*)malloc(sizeof(bool) * MAX_PID);
+     
+     if(pid_map == nullptr)
+     {
+         return -1;
+     }
+    
+    //marking all pid's as free
+    for (int i = 0; i < MAX_PID; i++)
+    {
+        pid_map[i] = false;
+    }
+    
+    return 1;
+}
+
+//Allocates and returns a new PID from the bitmap
+int allocate_pid()
+{
     bool *pid_map;
     
-    srand(time(0));
-    pid_map = (bool*)malloc(sizeof(bool) * MAX_PID);
+    int random_number = rand()%(MAX_PID-MIN_PID + 1) + MIN_PID;
     
-    return pid_map == NULL ? -1 : 1;
+    int pid = random_number;
     
+    while(pid_map[pid])
+    {
+        pid = rand()%(MAX_PID-MIN_PID + 1) + MIN_PID;
+    }
+    
+    pid_map[pid] = true;
+    
+    return pid;
 }
 
 int main(void)
